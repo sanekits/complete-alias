@@ -1,5 +1,14 @@
 # complete-alias
 
+*(This is a fork, the canoncial source belongs to https://github.com/cykerway/complete-alias )*
+
+## Quick setup:
+```
+curl -sL https://github.com/Stabledog/complete-alias/releases/download/1.18.5/setup-complete-alias.sh | bash -
+```
+
+## Description
+
 automagical shell alias completion;
 
 -   works with all common aliases, even self-aliases;
