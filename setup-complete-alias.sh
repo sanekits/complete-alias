@@ -60,7 +60,7 @@ local_setup() {
         # Let's see if that fixed it:
         command bash -l -c 'type -t _complete_alias' &>/dev/null || {
             cat >> "${HOME}/.bashrc" <<-EOF
-[[ -f "${HOME}/.completion_loader" ]] && source "${HOME}/.completion_loader" # Added by setup-complete-alias.sh
+[[ -f "\${HOME}/.completion_loader" ]] && source "\${HOME}/.completion_loader" # Added by setup-complete-alias.sh
 EOF
             echo "Added \"source ~/.completion_loader\" to your .bashrc" >&2
         }
