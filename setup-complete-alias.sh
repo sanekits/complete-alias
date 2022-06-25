@@ -19,21 +19,28 @@ curl_get_finalurl() {
 }
 
 try_aptget_install_bash_completion() {
-    which dpkg &>/dev/null || return $(die Cant run dpkg)
-    dpkg -s bash-completion 2>/dev/null | grep -qE 'install ok installed'  && { 
-       # Tis already installed
-        true; return; 
-    }  
-    [[ $UID == 0 ]] && {
-        useSudo="" 
-    } || { 
-        echo "Please enter your sudo password (if prompted) to install dependency 'bash-completion'" >&2
-        useSudo="sudo "
+    which dpkg &>/dev/null && {
+        # This branch works for apt/dpkg environments:
+        dpkg -s bash-completion 2>/dev/null | grep -qE 'install ok installed'  && { 
+            # Tis already installed
+            true; return; 
+        }  
+        [[ $UID == 0 ]] && {
+            useSudo="" 
+        } || { 
+            echo "Please enter your sudo password (if prompted) to install dependency 'bash-completion'" >&2
+            useSudo="sudo "
+        }
+        $useSudo apt-get install -y bash-completion && { 
+            return; 
+        }
     }
-    $useSudo apt-get install -y bash-completion || { 
-        return $(die "Failed to install bash-completion.  
-        Visit https://github.com/scop/bash-completion#readme for guidance, then try again")
+    [[ -f /usr/share/bash-completion/bash_completion ]] && {
+        # We'll take it on faith if the key file is present
+        return
     }
+    return $(die "Failed to install bash-completion.  
+            Visit https://github.com/scop/bash-completion#readme for guidance, then try again")
 }
 
 local_setup_prereqs() {
@@ -52,18 +59,15 @@ local_setup() {
     }
     command cp ./complete_alias "${HOME}/.bash_completion.d/" || die "Couldn't copy $PWD/complete_alias to $HOME/.bash_completion/"
 
-    # A subshell should be able to tell us if it worked:
+    # _complete_alias is not showing up in new shells, so let's get serious:
+    [[ -f ./completion_loader ]] || die "Couldn't find $PWD/completion_loader"
+    command cp ./completion_loader ${HOME}/.completion_loader || die "Couln't copy $PWD/completion_loader to $HOME/.completion_loader"
+    # Let's see if it works now:
     command bash -l -c 'type -t _complete_alias' &>/dev/null || {
-        # _complete_alias is not showing up in new shells, so let's get serious:
-        [[ -f ./completion_loader ]] || die "Couldn't find $PWD/completion_loader"
-        command cp ./completion_loader ${HOME}/.completion_loader || die "Couln't copy $PWD/completion_loader to $HOME/.completion_loader"
-        # Let's see if that fixed it:
-        command bash -l -c 'type -t _complete_alias' &>/dev/null || {
-            cat >> "${HOME}/.bashrc" <<-EOF
+        cat >> "${HOME}/.bashrc" <<-EOF
 [[ -f "\${HOME}/.completion_loader" ]] && source "\${HOME}/.completion_loader" # Added by setup-complete-alias.sh
 EOF
             echo "Added \"source ~/.completion_loader\" to your .bashrc" >&2
-        }
     }
 }
 
@@ -83,7 +87,7 @@ do_install() {
     local release_url=$(curl_get_finalurl "${SrcUrl}")
     [[ -n $release_url ]] || die "Failed fetching release URL with curl"
 
-    command curl  "$release_url" > release.html || die "curl failed for url [$release_url]"
+    command curl  -L  "$release_url" > release.html || die "curl failed for url [$release_url]"
 
     local expr='[0-9]+\.[0-9]+\.[0-9]+'
     local version=$( grep -E '/release' $PWD/release.html | grep -Eo "${expr}" | head -n 1 )
