@@ -1,0 +1,11 @@
+# .completion_loader  is sourced from ~/.bashrc if the normal bash-completion load process isn't working
+
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+fi
+[[ -d ${HOME}/.bash_completion.d ]] && {
+    for xf in ${HOME}/.bash_completion.d/*; do
+        source ${xf}
+    done
+}
+
