@@ -65,8 +65,6 @@ EOF
             echo "Added \"source ~/.completion_loader\" to your .bashrc" >&2
         }
     }
-
-    read -p "....?"
 }
 
 do_install() {
@@ -94,13 +92,15 @@ do_install() {
     # Example tarball url:
     # https://github.com/Stabledog/complete-alias/archive/refs/tags/1.18.0.tar.gz
     local tarball_url="${SrcBase}/archive/refs/tags/${version}.tar.gz"
-    echo "Fetching release tarball:"
+    echo "Fetching release tarball [${tarball_url}]:"
     command curl -Lo complete-alias.tar.gz "${tarball_url}" || die "Failed to download $tarball_url in $PWD"
     command tar xzf ./complete-alias.tar.gz || die "Failed to extract complete-alias.tar.gz in $PWD"
     local payload_dir="./complete-alias-${version}"
     command cp ${payload_dir}/{complete_alias,completion_loader} . || die "Failed to copy complete_alias to ."
 
     local_setup || die "local_setup() failed"
+
+    echo "Setup completed.  Restart your shell or run \"bash exec\" to use _complete_alias()"
 
     [[ -z $leaveDebris ]] && rm -rf ${tmpdir}
 }
