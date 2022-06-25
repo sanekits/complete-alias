@@ -1,4 +1,10 @@
 # .completion_loader  is sourced from ~/.bashrc if the normal bash-completion load process isn't working
+#
+#   _complete_alias needs ~/.bash_completion.d/complete_alias
+#   Example: how to use complete_alias:
+#
+#       alias container='docker container'
+#       complete -F _complete_alias container
 
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
@@ -8,4 +14,5 @@ fi
         source ${xf}
     done
 }
+COMPLETION_LOADER=1
 

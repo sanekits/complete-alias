@@ -52,10 +52,18 @@ local_setup() {
     }
     command cp ./complete_alias "${HOME}/.bash_completion.d/" || die "Couldn't copy $PWD/complete_alias to $HOME/.bash_completion/"
 
-    set -x
     # A subshell should be able to tell us if it worked:
-    command bash -l -c 'type -t _complete_alias' 2>&1 || {
-        
+    command bash -l -c 'type -t _complete_alias' &>/dev/null || {
+        # _complete_alias is not showing up in new shells, so let's get serious:
+        [[ -f ./completion_loader ]] || die "Couldn't find $PWD/completion_loader"
+        command cp ./completion_loader ${HOME}/.completion_loader || die "Couln't copy $PWD/completion_loader to $HOME/.completion_loader"
+        # Let's see if that fixed it:
+        command bash -l -c 'type -t _complete_alias' &>/dev/null || {
+            cat >> "${HOME}/.bashrc" <<-EOF
+[[ -f "${HOME}/.completion_loader" ]] && source "${HOME}/.completion_loader" # Added by setup-complete-alias.sh
+EOF
+            echo "Added \"source ~/.completion_loader\" to your .bashrc" >&2
+        }
     }
 
     read -p "....?"
@@ -89,8 +97,8 @@ do_install() {
     echo "Fetching release tarball:"
     command curl -Lo complete-alias.tar.gz "${tarball_url}" || die "Failed to download $tarball_url in $PWD"
     command tar xzf ./complete-alias.tar.gz || die "Failed to extract complete-alias.tar.gz in $PWD"
-    local payload_path="./complete-alias-${version}/complete_alias"
-    command cp "$payload_path" . || die "Failed to copy complete_alias to ."
+    local payload_dir="./complete-alias-${version}"
+    command cp ${payload_dir}/{complete_alias,completion_loader} . || die "Failed to copy complete_alias to ."
 
     local_setup || die "local_setup() failed"
 
