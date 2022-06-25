@@ -1,5 +1,10 @@
 # complete-alias
 
+## Quick setup:
+```
+curl -sL https://github.com/Stabledog/complete-alias/releases/download/1.18.4/setup-complete-alias.sh | bash -
+```
+
 automagical shell alias completion;
 
 -   works with all common aliases, even self-aliases;
