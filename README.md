@@ -4,7 +4,7 @@
 
 ## Quick setup:
 ```
-curl -sL https://github.com/Stabledog/complete-alias/releases/download/1.18.8/setup-complete-alias.sh | bash -
+curl -sL https://github.com/sanekits/complete-alias/releases/download/1.18.8/setup-complete-alias.sh | bash -
 ```
 
 ## Description
