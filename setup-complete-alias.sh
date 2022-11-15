@@ -9,7 +9,7 @@ die() {
     exit 1
 }
 
-SrcBase="https://github.com/stabledog/complete-alias"
+SrcBase="https://github.com/sanekits/complete-alias"
 SrcUrl="${SrcBase}/releases/latest"
 
 
