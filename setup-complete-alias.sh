@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup-complete-alias.h
-# Installs github:Stabledog/complete-alias for bash
+# Installs github:sanekits/complete-alias for bash
 #
 #
 
