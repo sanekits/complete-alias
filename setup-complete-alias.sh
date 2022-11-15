@@ -94,7 +94,7 @@ do_install() {
     [[ -n $version ]] || die "Failed to parse release version in $PWD/release.html"
 
     # Example tarball url:
-    # https://github.com/Stabledog/complete-alias/archive/refs/tags/1.18.0.tar.gz
+    # https://github.com/sanekits/complete-alias/archive/refs/tags/1.18.0.tar.gz
     local tarball_url="${SrcBase}/archive/refs/tags/${version}.tar.gz"
     echo "Fetching release tarball [${tarball_url}]:"
     command curl -Lo complete-alias.tar.gz "${tarball_url}" || die "Failed to download $tarball_url in $PWD"
