@@ -13,33 +13,33 @@ SrcBase="https://github.com/sanekits/complete-alias"
 SrcUrl="${SrcBase}/releases/latest"
 
 
-curl_get_finalurl() { 
+curl_get_finalurl() {
     # See https://stackoverflow.com/a/5300429/237059
-    command curl --silent --location --head --output /dev/null --write-out '%{url_effective}' -- "$@"; 
+    command curl --silent --location --head --output /dev/null --write-out '%{url_effective}' -- "$@";
 }
 
 try_aptget_install_bash_completion() {
     which dpkg &>/dev/null && {
         # This branch works for apt/dpkg environments:
-        dpkg -s bash-completion 2>/dev/null | grep -qE 'install ok installed'  && { 
+        dpkg -s bash-completion 2>/dev/null | grep -qE 'install ok installed'  && {
             # Tis already installed
-            true; return; 
-        }  
+            true; return;
+        }
         [[ $UID == 0 ]] && {
-            useSudo="" 
-        } || { 
+            useSudo=""
+        } || {
             echo "Please enter your sudo password (if prompted) to install dependency 'bash-completion'" >&2
             useSudo="sudo "
         }
-        $useSudo apt-get install -y bash-completion && { 
-            return; 
+        $useSudo apt-get install -y bash-completion && {
+            return;
         }
     }
     [[ -f /usr/share/bash-completion/bash_completion ]] && {
         # We'll take it on faith if the key file is present
         return
     }
-    return $(die "Failed to install bash-completion.  
+    return $(die "Failed to install bash-completion.
             Visit https://github.com/scop/bash-completion#readme for guidance, then try again")
 }
 
@@ -50,10 +50,9 @@ local_setup_prereqs() {
 }
 
 local_setup() {
-    # Assuming we have a copy of complete_alias in some temp dir, we can now do the setup stuff
-    # needed for bashrc
+    # Assuming we have copies of complete_alias and completion_loader in some
+    # temp dir, we can now do the setup stuff needed for bashrc:
     [[ -f ./complete_alias ]] || die "Can't find $PWD/complete_alias"
-    local_setup_prereqs || die "Can't satsify prerequisites for complete_alias"
     [[ -d ${HOME}/.bash_completion.d ]] || {
         command mkdir "${HOME}/.bash_completion.d" || die "Couldn't create $HOME/.bash_completion.d/"
     }
@@ -77,11 +76,11 @@ do_install() {
     for cmd in mktemp curl grep tar; do
         type -p "${cmd}" &>/dev/null || die "Can't find ${cmd}"
     done
-    
+
     local tmpdir=$(command mktemp -d)
     builtin cd ${tmpdir} || die "Can't cd to tmp dir ${tmpdir}"
     echo "Working in ${tmpdir}" >&2
-    
+
 
     echo "Fetching latest release info from ${SrcUrl}"
     local release_url=$(curl_get_finalurl "${SrcUrl}")
@@ -102,6 +101,7 @@ do_install() {
     local payload_dir="./complete-alias-${version}"
     command cp ${payload_dir}/{complete_alias,completion_loader} . || die "Failed to copy complete_alias to ."
 
+    local_setup_prereqs || die "Can't satsify prerequisites for complete_alias"
     local_setup || die "local_setup() failed"
 
     echo "Setup completed.  Restart your shell or run \"bash exec\" to use _complete_alias()"
