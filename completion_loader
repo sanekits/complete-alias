@@ -39,6 +39,11 @@ find_and_load_completions() {
             source ${xf}
         done
     }
+
+    # Make gets special attention
+    which make &>/dev/null && {
+        completion_loader make &>/dev/null
+    }
 }
 
 [[ -z $completionLoaderDone ]] && {
