@@ -3,9 +3,9 @@
 #   _complete_alias needs the complete_alias script
 #   Example: how to use complete_alias:
 #
-#       alias uu='uname'
-#       complete -F _complete_alias uu
-#       ... then type 'uu --' and hit tab to see completions
+#       alias hp='help'
+#       complete -F _complete_alias hp
+#       ... then type 'hp' and hit tab to see completions
 
 find_and_load_completions() {
     local root_loc
@@ -42,7 +42,7 @@ find_and_load_completions() {
 
     # Make gets special attention
     which make &>/dev/null && {
-        completion_loader make &>/dev/null
+        _completion_loader make &>/dev/null
     }
 }
 
