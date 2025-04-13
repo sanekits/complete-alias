@@ -1,11 +1,24 @@
+# shellcheck shell=bash
+#
 # .completion_loader  can be directly sourced from ~/.bashrc if the normal bash-completion load process isn't working
 #
 #   _complete_alias needs the complete_alias script
-#   Example: how to use complete_alias:
+
+#   Examples: 
+
+#     1. Completion for a simple alias of a command with completion:
+#           alias hp='help'
+#           complete -F _complete_alias hp
+#           ... then type 'hp' and hit tab to see completions of
+#             the bash 'help' function.
 #
-#       alias hp='help'
-#       complete -F _complete_alias hp
-#       ... then type 'hp' and hit tab to see completions
+#     2. Completion for a shell script which wraps another command:
+#           alias mymake=mymake.sh
+#           complete -F _make mymake.sh
+#           complete -F _complete_alias  mymake
+#           ... in this case, _complete_alias sees 'mymake',
+#           expands that to 'mymake.sh', and then forwards
+#           to the _make completor.
 
 find_and_load_completions() {
     local root_loc
