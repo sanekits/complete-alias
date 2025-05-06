@@ -1,0 +1,66 @@
+# shellcheck shell=bash
+#
+# .completion_loader  can be directly sourced from ~/.bashrc if the normal bash-completion load process isn't working
+#
+#   _complete_alias needs the complete_alias script
+
+#   Examples: 
+
+#     1. Completion for a simple alias of a command with completion:
+#           alias hp='help'
+#           complete -F _complete_alias hp
+#           ... then type 'hp' and hit tab to see completions of
+#             the bash 'help' function.
+#
+#     2. Completion for a shell script which wraps another command:
+#           alias mymake=mymake.sh
+#           complete -F _make mymake.sh
+#           complete -F _complete_alias  mymake
+#           ... in this case, _complete_alias sees 'mymake',
+#           expands that to 'mymake.sh', and then forwards
+#           to the _make completor.
+
+find_and_load_completions() {
+    local root_loc
+    # We want to load complete_alias first:
+    for root_loc in \
+        ${HOME}/.bash_completion.d \
+        ${HOME}/.local/bin/bashics/ ;  \
+        do
+            [[ -f ${root_loc}/complete_alias ]] && { \
+                source ${root_loc}/complete_alias
+                #echo "complete_alias found in ${root_loc}" >&2
+                break
+            }
+        done
+
+    # Let's find the general bash-completion stuff:
+    for root_loc in \
+        /opt/bb/share/bash-completion \
+        /usr/share/bash-completion \
+        /etc; do
+            #echo "root_loc=[${root_loc}]" >&2
+            [[ -f ${root_loc}/bash_completion ]] && { \
+                #echo "Found: ${root_loc}/bash_completion" >&2
+                source ${root_loc}/bash_completion
+            }
+        done
+
+    # Finally load the user's custom bash completions:
+    [[ -d ${HOME}/.bash_completion.d ]] && {
+        for xf in ${HOME}/.bash_completion.d/*; do
+            source ${xf}
+        done
+    }
+
+    # Make gets special attention
+    which make &>/dev/null && {
+        _completion_loader make &>/dev/null
+    }
+}
+
+[[ -z $completionLoaderDone ]] && {
+    find_and_load_completions
+    completionLoaderDone=1
+} || true;
+
